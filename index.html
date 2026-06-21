@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Retrô</title>
+    <style>
+        /* Reset e Fontes */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            background-image: radial-gradient(#222 15%, transparent 15%), radial-gradient(#222 15%, transparent 15%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container da Calculadora (Responsivo) */
+        .calculator {
+            background-color: #2d2d2d;
+            border: 4px solid #4a4a4a;
+            border-radius: 10px;
+            box-shadow: 0px 10px 0px #111, 0px 20px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 360px; /* Limita o tamanho no desktop */
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Marca/Logotipo Retrô */
+        .brand {
+            color: #ff007f;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-align: right;
+            text-shadow: 0 0 5px #ff007f;
+        }
+
+        /* Tela de Exibição (Glow de Fósforo Verde) */
+        .display-container {
+            background-color: #051a05;
+            border: 3px inset #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: inset 0px 0px 15px rgba(0,0,0,0.9);
+        }
+
+        #display {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #39ff14;
+            font-size: 2rem;
+            text-align: right;
+            outline: none;
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
+            overflow-x: auto;
+        }
+
+        /* Grade de Botões */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Estilização dos Botões Retrô */
+        button {
+            background-color: #3a3a3a;
+            border: 2px solid #555;
+            border-bottom: 5px solid #222;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+
+        button:active {
+            border-bottom-width: 2px;
+            transform: translateY(3px);
+            background-color: #444;
+        }
+
+        /* Cores Especiais para Operadores */
+        button.operator {
+            background-color: #34495e;
+            border-color: #46637f;
+            border-bottom-color: #1a252f;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        button.clear {
+            background-color: #c0392b;
+            border-color: #e74c3c;
+            border-bottom-color: #7f231c;
+            color: #fff;
+        }
+
+        button.equal {
+            background-color: #d35400;
+            border-color: #e67e22;
+            border-bottom-color: #a04000;
+            color: #fff;
+            grid-column: span 2; /* O botão de igual ocupa duas colunas */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="brand">Retro-Calc 1989</div>
+        
+        <div class="display-container">
+            <input type="text" id="display" readonly value="0">
+        </div>
+
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendCharacter('/')">/</button>
+            <button class="operator" onclick="appendCharacter('*')">*</button>
+            <button class="operator" onclick="appendCharacter('-')">-</button>
+            
+            <button onclick="appendCharacter('7')">7</button>
+            <button onclick="appendCharacter('8')">8</button>
+            <button onclick="appendCharacter('9')">9</button>
+            <button class="operator" onclick="appendCharacter('+')">+</button>
+            
+            <button onclick="appendCharacter('4')">4</button>
+            <button onclick="appendCharacter('5')">5</button>
+            <button onclick="appendCharacter('6')">6</button>
+            <button onclick="appendCharacter('.')">.</button>
+            
+            <button onclick="appendCharacter('1')">1</button>
+            <button onclick="appendCharacter('2')">2</button>
+            <button onclick="appendCharacter('3')">3</button>
+            <button class="equal" onclick="calculate()">=</button>
+            
+            <button onclick="appendCharacter('0')" style="grid-column: span 2;">0</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        // Adiciona números ou operadores na tela
+        function appendCharacter(char) {
+            if (display.value === '0' && !isNaN(char)) {
+                display.value = char; // Substitui o 0 inicial se for um número
+            } else {
+                display.value += char;
+            }
+        }
+
+        // Limpa a tela
+        function clearDisplay() {
+            display.value = '0';
+        }
+
+        // Executa o cálculo com segurança
+        function calculate() {
+            try {
+                // O eval faz o cálculo da string. Para uma calculadora simples, funciona perfeitamente.
+                let result = eval(display.value);
+                
+                // Evita problemas com dízimas periódicas longas na tela
+                if (result.toString().includes('.')) {
+                    result = parseFloat(result.toFixed(4));
+                }
+                
+                display.value = result;
+            } catch (error) {
+                display.value = 'ERRO';
+                setTimeout(clearDisplay, 1500); // Limpa o erro após 1.5 segundos
+            }
+        }
+    </script>
+</body>
+</html>
